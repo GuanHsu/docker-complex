@@ -1,0 +1,41 @@
+sudo: required
+services:
+  - docker
+  
+before_install:
+  - docker build -t mewto/docker-complex-test -f ./client/Dockerfile.dev ./client 
+ 
+script:
+  - docker run mewto/docker-complex-test npm run test -- --coverage 
+
+after_success:
+  - docker build -t mewto/docker-complex-client ./client
+  - docker build -t mewto/docker-complex-nginx  ./nginx
+  - docker build -t mewto/docker-complex-server ./server
+  - docker build -t mewto/docker-complex-worker ./worker
+
+# Login to docker CLI by setting up encrypted ID and password on Travis CI
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+# Take those images and push them to docker hub
+
+  - docker push mewto/docker-complex-client 
+  - docker push mewto/docker-complex-nginx
+  - docker push mewto/docker-complex-server
+  - docker push mewto/docker-complex-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-2"
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-us-east-2-640555552535
+  bucket_path: docker-multi
+  on: 
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
+
+

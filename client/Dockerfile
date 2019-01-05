@@ -14,6 +14,6 @@ RUN npm run build
 # Deploying to AWS EBS requires the port exposure to be specified
 FROM nginx
 EXPOSE 3000
-COPY i./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build /usr/share/nginx/html
 
