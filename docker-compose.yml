@@ -1,17 +1,25 @@
 version: '3'
 services:
   postgres:
+    networks:
+      - webnet
     image: 'postgres:latest'
   redis:
+    networks:
+      - webnet
     image: 'redis:latest'
   nginx:
-    restart: on-failure
+    networks:
+      - webnet
+    restart: always
     build:
       dockerfile: Dockerfile.dev
       context: ./nginx
     ports:
       - '3050:80'
   api:
+    networks:
+      - webnet
     build:
       dockerfile: Dockerfile.dev
       context: ./server
@@ -27,6 +35,8 @@ services:
       - PGPASSWORD=postgres_password
       - PGPORT=5432
   client:
+    networks:
+      - webnet 
     build:
       dockerfile: Dockerfile.dev
       context: ./client
@@ -34,6 +44,8 @@ services:
       - /app/node_modules
       - ./client:/app
   worker:
+    networks:
+      - webnet
     build:
       dockerfile: Dockerfile.dev
       context: ./worker
@@ -43,4 +55,5 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-
+networks:
+  webnet:
