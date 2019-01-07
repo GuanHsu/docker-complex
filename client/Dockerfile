@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ./package.json ./
 RUN npm install           
 
-COPY ./ ./
+COPY . .
 # Tell the image what to do when it starts as a container   # Build and run only used in Dev
 #CMD ["npm","run", "start"]                                 # Just build for Prod
 RUN npm run build
